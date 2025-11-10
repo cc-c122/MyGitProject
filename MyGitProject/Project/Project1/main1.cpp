@@ -1,34 +1,45 @@
-# include <iostream>
+#include <iostream>
 using namespace std;
 
-void so(int &a, int &b, int &c);
+int n[100];
+int sushu(int);
 
 int main() {
-	int t = 0;
-	cin >> t;
-	while (t--) {
-		int a = 0, b = 0, c = 0;
-		cin >> a >> b >> c;
-		so(a, b, c);
-		if (b + c > a) {
-			cout << "YES" << endl;
+	int x = 0, y = 0;
+	while (cin >> x >> y) {
+		if (x == 0 && y == 0) {
+			break;
+		}
+		int num = 0;
+		for (int i = x; i <= y; ++i) {
+			n[i] = i * i + i + 41;
+		}
+		for (int i = x; i <= y; ++i) {
+			num += sushu(n[i]);
+		}
+		if (y - x + 1 == num) {
+			cout << "OK" << endl;//
 		}
 		else {
-			cout << "NO" << endl;
+			cout << "SORRY" << endl;
 		}
 	}
-	return 0;//
+	return 0;
 }
 
-void so(int &a, int &b, int &c) {
-	int tmp = 0;
-	if (a < b) {
-		tmp = a, a = b , b = tmp;
+int  sushu(int x) {
+	if (x < 2) {
+		return 0;
 	}
-	if (a < c) {
-		tmp = a, a = c, c = tmp;
+	else if (x == 2) {
+		return 1;
 	}
-	if (b < c) {
-		tmp = b, b = c, c = tmp;
+	else {
+		for (int i = 2; i * i <= x; ++i) {
+			if (x % i == 0) {
+				return 0;
+			}	
+		}
+		return 1;
 	}
 }
