@@ -1,65 +1,87 @@
 #include <iostream>
 using namespace std;
 
-//在c++中，数组名会转化为该数组首元素的指针
-//二维数组名a等价于&a[0],一维数组名a[0]等价于&a[0][0]
-//指针数组  &p[i] = p + i
-//数组指针是个值，是指向二维数组整个行的，加一就加一整行，数组指针是二级指针，是地址的地址 ；（q + i）= *（q + i），正好重合
-int main() {
-	int x[3][4] = {
-		{2 ,5, 6 ,3},
-		{4 ,6, 7 ,1},
-		{5 ,3, 9 ,8}
-	};//定义一个3*4的数组
-	int* p[3] = { x[0],x[1],x[2] };//定义一个指针数组，存储的是数组x每一行的首元素的地址
-	int (*q)[4] = x;//定义一个数组指针，存储的是长度为4的int型数组的地址，指向二维数组x的第0行
+#define eleType int
 
-	//1,q + i / p + i
-	for (int i = 0; i < 3; ++i) {
-		cout << p + i << "，" ;/*p本身是一个数组名，代表数组首元素的地址，p就是本身指针数组的首地址，
-		                       p + i代表的是这个指针数组第i个元素的地址*/
-	}
-	cout << endl;
-	for (int i = 0; i < 3; ++i) {
-		cout << q + i << ", ";/*q指向的是二维数组的第0行这个一维数组，然后这个一维数组转换为该一维数组首元素的指针
-		                        q + i表示的是第i行首元素的地址*/
-	}
-	cout << endl;
+struct Sequentialist {
+	eleType* elements;
+    int size;
+	int capacity;
+};
 
-	//2,*(q + i) / *(p + i)
-	for (int i = 0; i < 3; ++i) {
-		cout << *(p + i) << ", ";/*（p + i）本身被存放在一个地址当中，存储的是二维数组第i行首元素的地址，
-		                            对（p + i）解引用后，得到的是存储的二维数组第i行首元素的地址*/
-	}
-	cout << endl;
-	for (int i = 0; i < 3; ++i) {
-		cout << *(q + i) << ", ";/*q + i指向的是二维数组中的第i行，对他解引用后，得到的是第i行这个一维数组本身，
-		                           这个一维数组又转化为该数组首元素的指针，所以还是个地址*/
-	}
-	cout << endl;
+void initializeList(Sequentialist* list, int capacity) {
+	list->elements = new eleType[capacity];
+	list->capacity = capacity;
+	list->size = 0;
+}
 
-	//3,*(q + i) + j / *(p + i) + j
-	for (int i = 0; i < 3; ++i) {
-		cout << *(p + i) + 1 << ", ";/*解引用后就已经成为第i行首元素的地址了，+ 1是第i行第一个元素的地址*/
-	}
-	cout << endl;
-	for (int i = 0; i < 3; ++i) {
-		cout << *(q + i) + 1<< ", ";/*解引用后就已经成为第i行首元素的地址了，+ 1是第i行第一个元素的地址*/
-	}
-	cout << endl;
+void destroyList(Sequentialist* list) {
+	delete[] list->elements;
+}
 
-	//把二维数组中元素表示出来
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 4; ++j) {
-			cout << *(p[i] + j) << ',';//p[i]是第i行首元素的地址，加j就是第i行第j个元素的地址，解引用后就是对应的数
+int size(Sequentialist* list) {
+	return list->size;
+}
+
+bool isEmpty(Sequentialist* list) {
+	if (list->size == 0) {
+		return -1;
+	}
+	else {
+		return 1;
+	}
+}
+
+void insert(Sequentialist* list, int index, eleType count) {
+	if (index < 0 || index > list->size) {
+		throw std::invalid_argument("Invalid index");
+	}
+	if (list->size == list->capacity) {
+		int Newcapacity = list->capacity * 2;
+		eleType* Newelements = new eleType[Newcapacity];
+		for (int i = 0; i < list->size; i++) {
+			Newelements[i] = list->elements[i];
 		}
-		cout << endl;
+		delete list->elements;
+		list->elements = Newelements;
+		list->capacity = Newcapacity;
 	}
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 4; ++j) {
-			cout << *(*(q + i)+ j)  << ',';/
+	for (int i = list->size; i > index; --i) {
+		list->elements[i] = list->elements[i-1];
+	}
+	list->elements[index] = count;
+	list->size++;
+}
+
+void deleteElement(Sequentialist* list, int index) {
+	if (index < 0 || index >= list->size) {
+		throw std::invalid_argument("Invalid index");
+	}
+	for (int i = index; i < list->size; ++i) {
+		list->elements[i] = list->elements[i + 1];
+	}
+	list->elements--;
+}
+
+int findElements(Sequentialist* list, eleType element) {
+	for (int i = 0; i < list->size; ++i) {
+		if (list->elements[i] == element) {
+			return i;
 		}
-		cout << endl;
+	}//
+	return -1;
+}
+
+eleType getElements(Sequentialist* list, int index) {
+	if (index < 0 || index >= list->size) {
+		throw std::invalid_argument("Invalid index");
 	}
-	return 0;
+	return list->elements[index];
+}
+
+void updateElements(Sequentialist* list, int index, eleType count) {
+	if (index < 0 || index >= list->size) {
+		throw std::invalid_argument("Invalid index");
+	}
+	list->elements[index] = count;
 }
