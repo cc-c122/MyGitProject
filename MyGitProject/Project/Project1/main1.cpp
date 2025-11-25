@@ -1,87 +1,111 @@
 #include <iostream>
+#include <stdexcept>
+
 using namespace std;
 
 #define eleType int
-
-struct Sequentialist {
-	eleType* elements;
-    int size;
-	int capacity;
+struct Listnote {
+	Listnote* next;
+	eleType date;
+	Listnote(eleType x) {
+		date = x;
+		next = NULL;
+	}
 };
 
-void initializeList(Sequentialist* list, int capacity) {
-	list->elements = new eleType[capacity];
-	list->capacity = capacity;
-	list->size = 0;
-}
+class LinkedList {
+private:
+	Listnote* head;
+	int size;
 
-void destroyList(Sequentialist* list) {
-	delete[] list->elements;
-}
+public:
+	LinkedList() :head(NULL), size(0) {};
+	~LinkedList();
+	void insert(int i, eleType value);
+	void remove(int i);
+	Listnote* find(eleType value);
+	Listnote* get(int i);
+	Listnote* update(int i, eleType value);
+	void print();
+};
 
-int size(Sequentialist* list) {
-	return list->size;
+LinkedList::~LinkedList() {
+	Listnote* curr = head;
+	while (curr) {
+		Listnote* tmp = curr;
+		curr = curr->next;
+		delete tmp;
+	}
 }
-
-bool isEmpty(Sequentialist* list) {
-	if (list->size == 0) {
-		return -1;
+void LinkedList::insert(int i, eleType value) {
+	if (i < 0 || i > size) {
+		throw out_of_range("Incalid position");
+	}
+	Listnote* newNote = new Listnote(value);
+	if (i == 0) {
+		newNote->next = head;
+		head = newNote;
 	}
 	else {
-		return 1;
-	}
-}
-
-void insert(Sequentialist* list, int index, eleType count) {
-	if (index < 0 || index > list->size) {
-		throw std::invalid_argument("Invalid index");
-	}
-	if (list->size == list->capacity) {
-		int Newcapacity = list->capacity * 2;
-		eleType* Newelements = new eleType[Newcapacity];
-		for (int i = 0; i < list->size; i++) {
-			Newelements[i] = list->elements[i];
+		Listnote* curr = head;
+		for (int j = 0; j < i - 1; ++j) {
+			curr = curr->next;
 		}
-		delete list->elements;
-		list->elements = Newelements;
-		list->capacity = Newcapacity;
+		newNote->next = curr->next;
+		curr->next = newNote;
 	}
-	for (int i = list->size; i > index; --i) {
-		list->elements[i] = list->elements[i-1];
-	}
-	list->elements[index] = count;
-	list->size++;
 }
-
-void deleteElement(Sequentialist* list, int index) {
-	if (index < 0 || index >= list->size) {
-		throw std::invalid_argument("Invalid index");
+void LinkedList:: remove(int i) {
+	if (i < 0 || i > size) {
+		throw out_of_range("Incalid position");
 	}
-	for (int i = index; i < list->size; ++i) {
-		list->elements[i] = list->elements[i + 1];
+	if (i == 0) {
+		Listnote* tmp = head;
+		head = head->next;
+		delete tmp;
 	}
-	list->elements--;
-}
-
-int findElements(Sequentialist* list, eleType element) {
-	for (int i = 0; i < list->size; ++i) {
-		if (list->elements[i] == element) {
-			return i;
+	else {
+		Listnote* curr = head;
+		for (int j = 0; j < i - 1; ++j) {
+			curr = curr->next;
 		}
-	}//
-	return -1;
+		Listnote* tmp = curr->next;
+		curr->next = tmp->next;
+		delete tmp;
+	}
+}//
+
+Listnote* LinkedList::find(eleType value) {
+	Listnote* curr = head;
+	while (curr && curr->date != value) {
+		curr = curr->next;
+	}
+	return curr;
 }
 
-eleType getElements(Sequentialist* list, int index) {
-	if (index < 0 || index >= list->size) {
-		throw std::invalid_argument("Invalid index");
+Listnote* LinkedList::get(int i) {
+	if (i < 0 || i > size) {
+		throw out_of_range("Incalid position");
 	}
-	return list->elements[index];
+	Listnote* curr = head;
+	for (int j = 0; j < i; ++j) {
+		curr = curr->next;
+	}
+	return curr;
+}
+Listnote* LinkedList::update(int i, eleType value) {
+	get(i)->date = value;
 }
 
-void updateElements(Sequentialist* list, int index, eleType count) {
-	if (index < 0 || index >= list->size) {
-		throw std::invalid_argument("Invalid index");
+void LinkedList::print() {
+	Listnote* curr = head;
+	while(curr){
+		cout << curr->date << ' ';
+		curr = curr->next;
 	}
-	list->elements[index] = count;
+	cout << endl;
+}
+int main() {
+
+	return 0;
 }
