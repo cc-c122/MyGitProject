@@ -1,60 +1,67 @@
 #include <iostream>
+#include <stdexcept>
 using namespace std;
 
 template <typename T>
-class Queue{
+class Stack {
 private:
 	T* date;
-	int front;
-	int rear;
+	int size;
 	int capacity;
 	void resize();
 public:
-	Queue() :date(new T[capacity]), front(0), rear(0), capacity(10) {};
-	~Queue();
-	void enqueue(T element);
-	T getFront() const;
-	T getSize() const;
+	Stack() : date(new T[10]), size(0), capacity(10);
+	~Stack();
+	void push(T element);
+	T pop();
+	T top() const;
+	int getSize() const;
 };
 template <typename T>
-void Queue<T>::resize() {
+void Stack<T>::resize() {
 	int newcapacity = capacity * 2;
 	T* newdate = new T[newcapacity];
-	for (int i = 0; i < rear; ++i) {
+	for (int i = 0; i < capacity; i++) {
 		newdate[i] = date[i];
 	}
 	delete[] date;
-	date = newdate;
 	capacity = newcapacity;
+	date = newdate;
 }
 
 template <typename T>
-Queue<T>::~Queue() {
-	delete date;
+Stack<T>::~Stack() {
+	delete[]date;
 }
+
 template <typename T>
-void Queue<T>::enqueue(T element){
-	if (rear == capacity) {
+void Stack<T>::push(T element) {
+	if (size == capacity) {
 		resize();
 	}
-	date[rear++] = element;
-}//
-
-template <typename T>
-T Queue<T>::getFront() const{
-	if (rear == front) {
-		throw std::underflow_error("Queue is empty");
-	}
-	return date[front++];
+	date[size++] = element;
 }
 
 template <typename T>
-T Queue<T>::getSize() const{
-	if (rear == front) {
-		throw std::underflow_error("Queue is empty");
+T Stack<T>::pop() {
+	if (size == 0) {
+		throw std::underflow_error("Stack is empty");
 	}
-	return date[front];
+	return date[--size];
 }
+
+template <typename T>
+T Stack<T>::top() const {
+	if (size == 0) {
+		throw std::underflow_error("Stack is empty");
+	}
+	return date[size - 1];
+}
+
+template <typename T>
+int Stack<T>::getSize() const {
+	return size;
+}/
 
 int main() {
 
