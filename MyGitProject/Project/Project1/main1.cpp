@@ -1,110 +1,61 @@
 #include <iostream>
-#include <stdexcept>
-
 using namespace std;
 
-#define eleType int
-struct Listnote {
-	Listnote* next;
-	eleType date;
-	Listnote(eleType x) {
-		date = x;
-		next = NULL;
-	}
-};
-
-class LinkedList {
+template <typename T>
+class Queue{
 private:
-	Listnote* head;
-	int size;
-
+	T* date;
+	int front;
+	int rear;
+	int capacity;
+	void resize();
 public:
-	LinkedList() :head(NULL), size(0) {};
-	~LinkedList();
-	void insert(int i, eleType value);
-	void remove(int i);
-	Listnote* find(eleType value);
-	Listnote* get(int i);
-	Listnote* update(int i, eleType value);
-	void print();
+	Queue() :date(new T[capacity]), front(0), rear(0), capacity(10) {};
+	~Queue();
+	void enqueue(T element);
+	T getFront() const;
+	T getSize() const;
 };
+template <typename T>
+void Queue<T>::resize() {
+	int newcapacity = capacity * 2;
+	T* newdate = new T[newcapacity];
+	for (int i = 0; i < rear; ++i) {
+		newdate[i] = date[i];
+	}
+	delete[] date;
+	date = newdate;
+	capacity = newcapacity;
+}
 
-LinkedList::~LinkedList() {
-	Listnote* curr = head;
-	while (curr) {
-		Listnote* tmp = curr;
-		curr = curr->next;
-		delete tmp;
-	}
+template <typename T>
+Queue<T>::~Queue() {
+	delete date;
 }
-void LinkedList::insert(int i, eleType value) {
-	if (i < 0 || i > size) {
-		throw out_of_range("Incalid position");
+template <typename T>
+void Queue<T>::enqueue(T element){
+	if (rear == capacity) {
+		resize();
 	}
-	Listnote* newNote = new Listnote(value);
-	if (i == 0) {
-		newNote->next = head;
-		head = newNote;
-	}
-	else {
-		Listnote* curr = head;
-		for (int j = 0; j < i - 1; ++j) {
-			curr = curr->next;
-		}
-		newNote->next = curr->next;
-		curr->next = newNote;
-	}
-}
-void LinkedList:: remove(int i) {
-	if (i < 0 || i > size) {
-		throw out_of_range("Incalid position");
-	}
-	if (i == 0) {
-		Listnote* tmp = head;
-		head = head->next;
-		delete tmp;
-	}
-	else {
-		Listnote* curr = head;
-		for (int j = 0; j < i - 1; ++j) {
-			curr = curr->next;
-		}
-		Listnote* tmp = curr->next;
-		curr->next = tmp->next;
-		delete tmp;
-	}
+	date[rear++] = element;
 }//
 
-Listnote* LinkedList::find(eleType value) {
-	Listnote* curr = head;
-	while (curr && curr->date != value) {
-		curr = curr->next;
+template <typename T>
+T Queue<T>::getFront() const{
+	if (rear == front) {
+		throw std::underflow_error("Queue is empty");
 	}
-	return curr;
+	return date[front++];
 }
 
-Listnote* LinkedList::get(int i) {
-	if (i < 0 || i > size) {
-		throw out_of_range("Incalid position");
+template <typename T>
+T Queue<T>::getSize() const{
+	if (rear == front) {
+		throw std::underflow_error("Queue is empty");
 	}
-	Listnote* curr = head;
-	for (int j = 0; j < i; ++j) {
-		curr = curr->next;
-	}
-	return curr;
-}
-Listnote* LinkedList::update(int i, eleType value) {
-	get(i)->date = value;
+	return date[front];
 }
 
-void LinkedList::print() {
-	Listnote* curr = head;
-	while(curr){
-		cout << curr->date << ' ';
-		curr = curr->next;
-	}
-	cout << endl;
-}
 int main() {
 
 	return 0;
