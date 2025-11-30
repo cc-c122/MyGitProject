@@ -2,27 +2,12 @@
 using namespace std;
 
 template<typename T>
-struct ListNode {
-	T date;
-	ListNode* next;
-	ListNode(T d) :date(d), next(NULL) {}
-};
-
-template<typename T>
 struct TreeNode {
-	T data;
-	ListNode<TreeNode<T>*>* childrenHead;
-
-	void AddChild(TreeNode<T>* node) {
-		ListNode<TreeNode<T>*>* ChildNode = new ListNode<TreeNode<T>*>(node);
-		if (childrenHead == NULL) {
-			childrenHead = ChildNode;
-		}
-		else {
-			ChildNode->next = childrenHead;
-			childrenHead = ChildNode;
-		}
-	}
+	T val;
+	TreeNode* left;
+	TreeNode* right;
+	TreeNode() :val(0), left(NULL), right(NULL) {}
+	TreeNode(T d) :val(d), left(NULL), right(NULL) {}
 };
 
 template<typename T>
@@ -30,27 +15,66 @@ class Tree {
 private:
 	TreeNode<T>* nodes;
 	TreeNode<T>* root;
+	rsize_t nodeSize;
+	TreeNode<T>* Creat(T a[], int size, int nodeID, T nullNode) {
+		if (nodeID >= size || nodeID == nullNode) {
+			return NULL;
+		}
+		TreeNode<T>* nowNode = GetTreeNode(nodeID);
+		nowNode->val = a[nodeID];
+		nowNode->left = creat(a, size, nodeID * 2, nullNode);
+		nowNode->right = creat(a, size, nodeID * 2+1, nullNode);
+		return nowNode;
+	}
+	void visit(TreeNode<T>* node) {
+		cout << node->val;
+	}
+	void preOrder(TreeNode<T>* node) {
+		if (node) {
+			visit(node);
+			preOrder(node->left);
+			preOrder(node->right);
+		}
+	}
+	void inOrder(TreeNode<T>* node) {
+		if (node) {
+			inOrder(node->left);
+			visit(node);
+			inOrder(node->right);
+		}
+	}
+	void postOrder(TreeNode<T>* node) {
+		if (node) {
+			postOrder(node->left);
+			postOrder(node->right);
+			visit(node);
+		}
+	}
+	void levelOrder(TreeNode<T>* node) {
+		if (node) {
+			visit(node);
+			preOrder(node->left);
+			preOrder(node->right);
+		}
+	}
 public:
 	Tree();
 	Tree(int maxNodes);
 	~Tree();
 	TreeNode<T>* GetTreeNode(int id);
-	void SetRoot(int id);
-	void AddChild(int parentID, int sonID);
-	void AssignDate(int nodeID, T date);
-	void Print(TreeNode<T>* node = NULL);
+	void CreateTree(T a[], int size, T nullNode);
+	void inOrderTraversal();
+	void postOrderTraversal();
+	void levelOrderTraversal();
 };
-
 template<typename T>
 Tree<T>::Tree() {
-	nodes = new TreeNode<T>[1000];
-	root = NULL;
+	nodes = new TreeNode * [10000];
 }
 
 template<typename T>
 Tree<T>::Tree(int maxNodes) {
-	nodes = new TreeNode<T>[maxNodes];
-	root = NULL;
+	nodes = new TreeNode * [maxNodes];
 }
 
 template<typename T>
@@ -64,33 +88,23 @@ TreeNode<T>* Tree<T>::GetTreeNode(int id) {
 }
 
 template<typename T>
-void Tree<T>::SetRoot(int id) {
-	root = GetTreeNode(id);
+void Tree<T>::CreateTree(T a[], int size, T nullNode) {
+	root = Creat(a, size, 1, nullNode);
 }
 
 template<typename T>
-void Tree<T>::AddChild(int parentID, int sonID) {
-	TreeNode<T>* parentNode = GetTreeNode(parentID);
-	TreeNode<T>* sonNode = GetTreeNode(sonID);
-	parentNode->AddChild(sonNode);
+void Tree<T>::inOrderTraversal() {
+	preOrder(root);
 }
 
 template<typename T>
-void Tree<T>::AssignDate(int ID, T data) {
-	GetTreeNode(ID)->data = data;
+void Tree<T>::postOrderTraversal() {
+	postOrder(root);
 }
 
 template<typename T>
-void Tree<T>::Print(TreeNode<T>* node) {
-	if (node == NULL) {
-		node = root;
-	}
-	cout << node->data;
-	ListNode<TreeNode<T>*>* tmp = node->childrenHead;
-	while (tmp) {
-		print(tmp);
-		tmp = tmp->next;
-	}
+void Tree<T>::inOrderTraversal() {
+	inOrder(root);
 }/
 
 int main() {
