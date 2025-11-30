@@ -1,66 +1,96 @@
-#include <iostream>
-#include <stdexcept>
+#include<iostream>
 using namespace std;
 
-template <typename T>
-class Stack {
-private:
-	T* date;
-	int size;
-	int capacity;
-	void resize();
-public:
-	Stack() : date(new T[10]), size(0), capacity(10);
-	~Stack();
-	void push(T element);
-	T pop();
-	T top() const;
-	int getSize() const;
+template<typename T>
+struct ListNode {
+	T date;
+	ListNode* next;
+	ListNode(T d) :date(d), next(NULL) {}
 };
-template <typename T>
-void Stack<T>::resize() {
-	int newcapacity = capacity * 2;
-	T* newdate = new T[newcapacity];
-	for (int i = 0; i < capacity; i++) {
-		newdate[i] = date[i];
+
+template<typename T>
+struct TreeNode {
+	T data;
+	ListNode<TreeNode<T>*>* childrenHead;
+
+	void AddChild(TreeNode<T>* node) {
+		ListNode<TreeNode<T>*>* ChildNode = new ListNode<TreeNode<T>*>(node);
+		if (childrenHead == NULL) {
+			childrenHead = ChildNode;
+		}
+		else {
+			ChildNode->next = childrenHead;
+			childrenHead = ChildNode;
+		}
 	}
-	delete[] date;
-	capacity = newcapacity;
-	date = newdate;
+};
+
+template<typename T>
+class Tree {
+private:
+	TreeNode<T>* nodes;
+	TreeNode<T>* root;
+public:
+	Tree();
+	Tree(int maxNodes);
+	~Tree();
+	TreeNode<T>* GetTreeNode(int id);
+	void SetRoot(int id);
+	void AddChild(int parentID, int sonID);
+	void AssignDate(int nodeID, T date);
+	void Print(TreeNode<T>* node = NULL);
+};
+
+template<typename T>
+Tree<T>::Tree() {
+	nodes = new TreeNode<T>[1000];
+	root = NULL;
 }
 
-template <typename T>
-Stack<T>::~Stack() {
-	delete[]date;
+template<typename T>
+Tree<T>::Tree(int maxNodes) {
+	nodes = new TreeNode<T>[maxNodes];
+	root = NULL;
 }
 
-template <typename T>
-void Stack<T>::push(T element) {
-	if (size == capacity) {
-		resize();
+template<typename T>
+Tree<T>::~Tree() {
+	delete[] nodes;
+}
+
+template<typename T>
+TreeNode<T>* Tree<T>::GetTreeNode(int id) {
+	return &nodes[id];
+}
+
+template<typename T>
+void Tree<T>::SetRoot(int id) {
+	root = GetTreeNode(id);
+}
+
+template<typename T>
+void Tree<T>::AddChild(int parentID, int sonID) {
+	TreeNode<T>* parentNode = GetTreeNode(parentID);
+	TreeNode<T>* sonNode = GetTreeNode(sonID);
+	parentNode->AddChild(sonNode);
+}
+
+template<typename T>
+void Tree<T>::AssignDate(int ID, T data) {
+	GetTreeNode(ID)->data = data;
+}
+
+template<typename T>
+void Tree<T>::Print(TreeNode<T>* node) {
+	if (node == NULL) {
+		node = root;
 	}
-	date[size++] = element;
-}
-
-template <typename T>
-T Stack<T>::pop() {
-	if (size == 0) {
-		throw std::underflow_error("Stack is empty");
+	cout << node->data;
+	ListNode<TreeNode<T>*>* tmp = node->childrenHead;
+	while (tmp) {
+		print(tmp);
+		tmp = tmp->next;
 	}
-	return date[--size];
-}
-
-template <typename T>
-T Stack<T>::top() const {
-	if (size == 0) {
-		throw std::underflow_error("Stack is empty");
-	}
-	return date[size - 1];
-}
-
-template <typename T>
-int Stack<T>::getSize() const {
-	return size;
 }/
 
 int main() {
